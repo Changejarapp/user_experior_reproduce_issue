@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    alias(libs.plugins.firebase.perf) apply false
+//    alias(libs.plugins.firebase.perf) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.cashsqldelight) apply false
     alias(libs.plugins.kmm.bridge) apply false
@@ -46,9 +46,9 @@ buildscript {
         classpath(libs.kotlin.gradle.plugin)
         classpath(libs.androidx.navigation.safe.args.gradle.plugin)
         classpath(libs.hilt.android.gradle.plugin)
-        classpath(libs.google.services)
-        classpath(libs.firebase.appdistribution.gradle)
-        classpath(libs.firebase.crashlytics.gradle)
+//        classpath(libs.google.services)
+//        classpath(libs.firebase.appdistribution.gradle)
+//        classpath(libs.firebase.crashlytics.gradle)
         classpath(libs.hypersdk.asset.plugin)
         classpath(libs.build.konfig)
         classpath(libs.moko.resources.generator)

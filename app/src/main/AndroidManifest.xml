@@ -6,8 +6,7 @@
 
 
     <application
-        android:name=".SampleJarApp"
-        android:theme="@style/Theme.AppCompat"
+        android:name="com.jar.app.base.SampleJarApp"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
@@ -15,22 +14,14 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat"
         tools:replace="android:allowBackup,android:fullBackupContent,android:name,android:theme">
 
-        <!-- This is used for printing firebase logs  -->
-        <meta-data
-            android:name="firebase_performance_logcat_enabled"
-            android:value="true" />
-
-        <profileable android:shell="true"
-            tools:targetApi="q" />
-
         <activity
-            android:name=".feature.home.ui.activity.HomeActivity"
+            android:name="com.jar.app.base.HomeActivity"
+            android:configChanges="orientation|screenLayout|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation|screenLayout|screenSize"
             android:windowSoftInputMode="adjustResize">
 
             <intent-filter>

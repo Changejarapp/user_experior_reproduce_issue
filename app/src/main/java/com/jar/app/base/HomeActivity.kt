@@ -1,25 +1,16 @@
-package com.jar.app.feature.home.ui.activity
+package com.jar.app.base
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.app.UiModeManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.userexperior.UserExperior
-
-
-internal class HomeActivity :
-    AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initUserExperior(this)
     }
-
 }
 
 private fun initUserExperior(context: Context) {

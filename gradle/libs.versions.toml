@@ -89,8 +89,8 @@ lifecycleRuntimeCompose = "2.6.1"
 lifecycleRuntimeKtx = "2.6.1"
 lifecycleViewmodelKtx = "2.6.1"
 listenablefuture = "9999.0-empty-to-avoid-conflict-with-guava"
-lottie = "6.3.2-SNAPSHOT"
-lottieCompose = "6.3.2-SNAPSHOT"
+lottie = "6.4.0"
+lottieCompose = "6.4.0"
 material = "1.9.0"
 mockk = "1.9.2"
 mockk-mockk = "1.12.5"
@@ -162,11 +162,6 @@ androidx-navigation-dynamic-features-fragment = { module = "androidx.navigation:
 androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationFragmentKtx" }
 androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileinstaller" }
 androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
-core-analytics = { module = "com.jar.internal.library.core-analytics:shared", version.ref = "core-analytics" }
-core-network = { module = "com.jar.internal.library.core-network:shared", version.ref = "core-network" }
-core-remote-config = { module = "com.jar.internal.library.core-config:shared", version.ref = "core-remote-config" }
-core-kmm-flow = { module = "com.jar.internal.library.core-kmm-flow:shared", version.ref = "core-kmm-flow" }
-core-paging = { module = "com.jar.internal.library.paging:paging", version.ref = "core-paging" }
 
 amplitude-android = { module = "com.amplitude:analytics-android", version.ref = "amplitude" }
 
@@ -280,7 +275,6 @@ contacts-android = { module = "com.github.vestrel00:contacts-android", version.r
 
 core = { module = "com.github.vestrel00.contacts-android:core", version.ref = "contactsAndroid" }
 
-core-preferences = { module = "com.jar.internal.library.core-preferences:shared", version.ref = "corePreferencesVersion" }
 corelib = { module = "id.bureau:corelib", version.ref = "corelib" }
 countrycodepicker = { module = "com.github.joielechong:countrycodepicker", version.ref = "countrycodepicker" }
 
@@ -391,7 +385,6 @@ review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "rev
 ripplebackground-library = { module = "com.skyfishjy.ripplebackground:library", version.ref = "libraryVersion" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 
-shared = { module = "com.jar.internal.library.core-kmm-flow:shared", version.ref = "shared" }
 
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 
