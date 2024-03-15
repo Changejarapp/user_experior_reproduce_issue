@@ -1,5 +1,7 @@
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.internal.api.ReadOnlyProductFlavor
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import org.gradle.internal.extensibility.DefaultExtraPropertiesExtension
 
 plugins {
@@ -9,17 +11,26 @@ plugins {
     id("kotlin-kapt")
     id("kotlin-parcelize")
     id("dagger.hilt.android.plugin")
-//    id("com.google.gms.google-services")
-//    id("com.google.firebase.appdistribution")
-//    id("com.google.firebase.crashlytics")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.appdistribution")
+    id("com.google.firebase.crashlytics")
     id("hypersdk.plugin")
-//    alias(libs.plugins.firebase.perf) apply false
+    alias(libs.plugins.firebase.perf) apply false
     alias(libs.plugins.kotlin.serialization)
 }
 
 
 android {
     compileSdk = rootProject.extra.get("compileSdk") as Int
+
+    signingConfigs {
+        named("debug") {
+            storeFile = file("../debugcert")
+            storePassword = "ChangeJar@Save$"
+            keyAlias = "changejardebug"
+            keyPassword = "ChangeJar"
+        }
+    }
 
     bundle {
         language {
@@ -38,16 +49,231 @@ android {
 
         testInstrumentationRunner = "com.jar.app.core_tests.HiltTestRunner"
 
+        buildConfigField("String", "UX_CAM_KEY", "\"cshbbuxtt8aip09\"")
+
         configurations.all {
             resolutionStrategy {
                 force("androidx.emoji2:emoji2:1.3.0")
                 force("androidx.emoji2:emoji2-views-helper:1.3.0")
                 force("co.touchlab:kermit:2.0.2")
                 force("com.github.bumptech.glide:compiler:4.13.2")
-//                exclude(group = "com.google.guava", module = "listenablefuture")
             }
         }
     }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
+            buildConfigField("Boolean", "IS_PLAY_STORE", "true")
+            buildConfigField("Boolean", "MOCK", "false")
+            lintOptions {
+                disable("MissingTranslation")
+                disable("ExtraTranslation")
+            }
+            isTestCoverageEnabled = false
+
+            // Extension for firebase NDK crash report.
+            configure<CrashlyticsExtension> {
+                nativeSymbolUploadEnabled = true
+                strippedNativeLibsDir = "build/intermediates/stripped_native_libs/release/out/lib"
+                unstrippedNativeLibsDir = "build/intermediates/merged_native_libs/release/out/lib"
+            }
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+            buildConfigField("Boolean", "IS_PLAY_STORE", "false")
+            buildConfigField("Boolean", "MOCK", "false")
+            buildConfigField("Boolean", "DEBUG", "true")
+            isDebuggable = true
+            isTestCoverageEnabled = true
+        }
+        create("mock") {
+            signingConfig = signingConfigs.getByName("mock")
+            buildConfigField("Boolean", "IS_PLAY_STORE", "false")
+            buildConfigField("Boolean", "MOCK", "true")
+            buildConfigField("Boolean", "DEBUG", "true")
+            isDebuggable = true
+            isTestCoverageEnabled = false
+        }
+    }
+
+    flavorDimensions.add("config")
+    productFlavors {
+        create("prod") {
+            dimension = "config"
+            applicationId = "com.jar.app"
+            buildConfigField("String", "PAYTM_MID", "\"CHANGE32137276398543\"")
+            buildConfigField(
+                "String",
+                "PAYTM_CALLBACK_URL",
+                "\"https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=\""
+            )
+            buildConfigField(
+                "String",
+                "PAYTM_PAYMENT_URL",
+                "\"https://securegw.paytm.in/theia/api/v1/showPaymentPage\""
+            )
+            buildConfigField(
+                "String",
+                "BASE_URL_SMS_PARSER",
+                "\"https://webhook.myjar.app/production/\""
+            )
+            buildConfigField(
+                "String",
+                "BUREAU_AUTH_CLIENT_ID",
+                "\"2623ca06-95e7-4d12-a5ff-9b4f98e7eab7\""
+            )
+            buildConfigField(
+                "String",
+                "BUREAU_CALLBACK_URL",
+                "\"https://prod.myjar.app/v1/callback/otl/status\""
+            )
+            buildConfigField("String", "PHONEPE_PACKAGE", "\"com.phonepe.app\"")
+            buildConfigField("String", "AUSPICIOUS_TIME_TOPIC", "\"auspiciousTimeAlertsTopic\"")
+            resValue("string", "CLEVERTAP_ACCOUNT_ID", "W84-655-7R6Z")
+            resValue("string", "CLEVERTAP_ACCOUNT_TOKEN", "556-4b0")
+            resValue("string", "CLEVERTAP_XIAOMI_APP_ID", "2882303761519927429")
+            val trueCallerKey by extra {
+                mapOf(
+                    "debug" to "tWvZT89efd251ca844b68a1557b28fbaf9594",
+                    "mock" to "tWvZT89efd251ca844b68a1557b28fbaf9594",
+                    "release" to "ZD4wr666c4798b2584a169c8350ce861c9a39"
+                )
+            }
+            manifestPlaceholders["templateId"] = "/6H9Q"
+            manifestPlaceholders["oneLinkUrl1"] = "jar.onelink.me"
+            manifestPlaceholders["oneLinkUrl2"] = "click.myjar.app"
+            manifestPlaceholders["oneLinkUrl3"] = "start.myjar.app"
+
+            firebaseAppDistribution {
+                releaseNotes = rootProject.extra.get("appDistributionReleaseNotes") as String
+                serviceCredentialsFile = "$rootDir/changejarprod_app_distribution.json"
+                groups = "teamjar"
+            }
+        }
+        create("prodReplica") {
+            dimension = "config"
+            applicationId = "com.jar.app.replica"
+            buildConfigField("String", "PAYTM_MID", "\"CHANGE32137276398543\"")
+            buildConfigField(
+                "String",
+                "PAYTM_CALLBACK_URL",
+                "\"https://securegw.paytm.in/theia/paytmCallback?ORDER_ID=\""
+            )
+            buildConfigField(
+                "String",
+                "PAYTM_PAYMENT_URL",
+                "\"https://securegw.paytm.in/theia/api/v1/showPaymentPage\""
+            )
+            buildConfigField(
+                "String",
+                "BASE_URL_SMS_PARSER",
+                "\"https://webhook.myjar.app/prod-replica/\""
+            )
+            buildConfigField(
+                "String",
+                "BUREAU_AUTH_CLIENT_ID",
+                "\"2623ca06-95e7-4d12-a5ff-9b4f98e7eab7\""
+            )
+            buildConfigField(
+                "String",
+                "BUREAU_CALLBACK_URL",
+                "\"https://prod-replica.myjar.app/v1/callback/otl/status\""
+            )
+            buildConfigField("String", "PHONEPE_PACKAGE", "\"com.phonepe.app.preprod\"")
+            buildConfigField("String", "AUSPICIOUS_TIME_TOPIC", "\"auspiciousTimeAlertsReplica\"")
+            resValue("string", "CLEVERTAP_ACCOUNT_ID", "W84-655-7R6Z")
+            resValue("string", "CLEVERTAP_ACCOUNT_TOKEN", "556-4b0")
+            val trueCallerKey by extra {
+                mapOf(
+                    "debug" to "QpSVJ64e66ad11abf4eda9754399e82845bf4",
+                    "mock" to "r4WZGa844413a431b4c8d92e298c031e52f43",
+                    "release" to "jxnzTf3b23103e890411c8252fd2dbeaea1b5"
+                )
+            }
+
+            manifestPlaceholders["templateId"] = "/6H9Q"
+            manifestPlaceholders["oneLinkUrl1"] = "jar.onelink.me"
+            manifestPlaceholders["oneLinkUrl2"] = "click.myjar.app"
+            manifestPlaceholders["oneLinkUrl3"] = "start.myjar.app"
+
+            firebaseAppDistribution {
+                releaseNotes = rootProject.extra.get("appDistributionReleaseNotes") as String
+                serviceCredentialsFile = "$rootDir/changejarprod_app_distribution.json"
+                groups = "teamjar"
+            }
+        }
+        create("staging") {
+            dimension = "config"
+            applicationId = "com.aso_centric.jar.staging"
+            buildConfigField("String", "PAYTM_MID", "\"CHANGE11588127832171\"")
+            buildConfigField(
+                "String",
+                "PAYTM_CALLBACK_URL",
+                "\"https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=\""
+            )
+            buildConfigField(
+                "String",
+                "PAYTM_PAYMENT_URL",
+                "\"https://securegw-stage.paytm.in/theia/api/v1/showPaymentPage\""
+            )
+            buildConfigField(
+                "String",
+                "BASE_URL_SMS_PARSER",
+                "\"https://webhook.myjar.app/staging/\""
+            )
+            buildConfigField(
+                "String",
+                "BUREAU_AUTH_CLIENT_ID",
+                "\"4e44dbc4-a7b7-4979-abac-64ea9db511e2\""
+            )
+            buildConfigField(
+                "String",
+                "BUREAU_CALLBACK_URL",
+                "\"https://dev.myjar.app/v1/callback/otl/status\""
+            )
+            buildConfigField("String", "PHONEPE_PACKAGE", "\"com.phonepe.app.preprod\"")
+            buildConfigField("String", "AUSPICIOUS_TIME_TOPIC", "\"auspiciousTimeAlertsReplica\"")
+            resValue("string", "CLEVERTAP_ACCOUNT_ID", "TEST-Z84-655-7R6Z")
+            resValue("string", "CLEVERTAP_ACCOUNT_TOKEN", "TEST-556-4b1")
+            val trueCallerKey by extra {
+                mapOf(
+                    "debug" to "X5HEd6bb15d250c9440e39b123c174b467c84",
+                    "mock" to "oj02uf8c0288afe7449d89930f2f3bca433df",
+                    "release" to "VmdX6b52cab8a5b93487ba7977b0914df63f4"
+                )
+            }
+
+            firebaseAppDistribution {
+                releaseNotes = rootProject.extra.get("appDistributionReleaseNotes") as String
+                serviceCredentialsFile = "$rootDir/changejarstaging_app_distribution.json"
+                groups = "teamjar"
+            }
+            manifestPlaceholders["templateId"] = "/iZH6"
+            manifestPlaceholders["oneLinkUrl1"] = "jar-staging.onelink.me"
+            manifestPlaceholders["oneLinkUrl2"] = "jar-staging.onelink.me"
+            manifestPlaceholders["oneLinkUrl3"] = "jar-staging.onelink.me"
+        }
+    }
+
+
+    applicationVariants.all(object : Action<ApplicationVariant> {
+        override fun execute(variant: ApplicationVariant) {
+            val flavor = variant.productFlavors[0] as ReadOnlyProductFlavor
+            val extra = flavor.getProperty("ext") as DefaultExtraPropertiesExtension
+            val map = extra.get("trueCallerKey") as Map<*, *>
+            val value = map[variant.buildType.name] as String
+            variant.resValue("string", "TRUECALLER_APP_KEY", value)
+        }
+
+    })
+
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -68,6 +294,44 @@ android {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
 
+
+    sourceSets {
+
+        // non-instrumental test example
+        getByName("test") {
+            //java.srcDir(project(":core-tests").file("src/test/java"))
+        }
+        // instrumental test example
+        getByName("androidTest") {
+            //java.srcDir(project(":core-tests").file("src/androidTest/java"))
+        }
+
+        getByName("mock") {
+            assets {
+                srcDirs("src/main/assetsDebug")
+            }
+        }
+        getByName("main") {
+            assets {
+                srcDirs("src/main/assets")
+            }
+        }
+    }
+
+    packagingOptions {
+        resources {
+            merges.add("values-**/*")
+            merges.add("values/*")
+            merges.add("drawable/ic_arrow_back.xml")
+        }
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
     namespace = "com.jar.app"
 
     kapt {
@@ -76,9 +340,140 @@ android {
 }
 
 dependencies {
+
+
+    val mockImplementation by configurations
+
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.9")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    implementation(libs.core.preferences)
+
+
+
+
+
+
+
+
+
+
+
+    //Core Web Pdf Viewer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Feature Daily Investment Tempering
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     implementation(libs.mpAndroidChart)
+
+
+
     //FlexBox
     implementation(libs.flexbox)
 
@@ -178,7 +573,7 @@ dependencies {
     implementation(libs.clevertap.android.sdk)
     implementation(libs.push.templates)
 
-    
+
 
     //AppsFlyer SDK
     implementation(libs.appsflyer.af.android.sdk)
@@ -204,17 +599,17 @@ dependencies {
     //InstallReferrer
     implementation(libs.installreferrer)
 
-//    //Firebase BOM
-//    implementation(platform(libs.firebase.bom))
-//
-//    //Firebase
-//    implementation(libs.bundles.firebase)
+    //Firebase BOM
+    implementation(platform(libs.firebase.bom))
+
+    //Firebase
+    implementation(libs.bundles.firebase)
 
     // Play Services Ads
     //implementation(libs.gms.play.services.ads.lite)
 
     //Auto Read
-//    implementation(libs.bundles.play.services.auth)
+    implementation(libs.bundles.play.services.auth)
 
     //Phone Number Formatting
     implementation(libs.libphonenumber.android)
@@ -244,7 +639,7 @@ dependencies {
     testImplementation(libs.truth)
 
     // Coroutine support in Play services [Tasks]
-//    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     //Shimmer
     implementation(libs.shimmer)
@@ -275,7 +670,7 @@ dependencies {
     //Integration with LiveData
     implementation(libs.compose.runtime.livedata)
     //play-services-base
-//    implementation(libs.gms.play.services.basement)
+    implementation(libs.gms.play.services.basement)
 
     //downloadable fonts
     implementation(libs.compose.ui.google.fonts)
@@ -283,10 +678,18 @@ dependencies {
     //Bureau SDK
     implementation(libs.corelib)
 
+
+
     //Epoxy
     implementation(libs.epoxy)
     kapt(libs.epoxy.processor) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
+    }
+}
+
+configurations {
+    all {
+        exclude(group = "com.google.guava", module = "listenablefuture")
     }
 }
 
